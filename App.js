@@ -23,7 +23,7 @@ import { supabase } from './src/lib/supabase';
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 
-function MainTabs() {
+function MainTabs({ onLogout }) {
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
@@ -70,28 +70,97 @@ function MainTabs() {
         component={DestinationsScreen}
         options={{ title: 'Destinos Populares' }}
       />
-      <Tabs.Screen
-        name="Cuenta"
-        component={AccountScreen}
-        options={{ title: 'Cuenta' }}
-      />
+      <Tabs.Screen name="Cuenta" options={{ title: 'Cuenta' }}>
+        {(props) => <AccountScreen {...props} onLogout={onLogout} />}
+      </Tabs.Screen>
     </Tabs.Navigator>
   );
 }
 
 export default function App() {
+  // user tiene siempre este shape: { user, session, email, name } o null
   const [user, setUser] = useState(null);
 
-  // 🔹 PRUEBA de conexión a Supabase: se ejecuta una sola vez al montar App
+  // Inicializar sesión y escuchar eventos de auth
   useEffect(() => {
-    const testSupabase = async () => {
-      const { data, error } = await supabase
-        .from('countries')
-        .select('*')
-        .limit(3);
+    let isMounted = true;
 
-      console.log('Supabase test data:', data);
-      console.log('Supabase test error:', error);
+    const initSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.log('Error obteniendo sesión inicial:', error);
+          return;
+        }
+
+        if (session?.user && isMounted) {
+          const u = session.user;
+          setUser({
+            user: u,
+            session,
+            email: u.email,
+            name:
+              u.user_metadata?.full_name ||
+              u.user_metadata?.name ||
+              u.email,
+          });
+        }
+      } catch (err) {
+        console.log('Error inesperado al inicializar sesión:', err);
+      }
+    };
+
+    initSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        return;
+      }
+
+      if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        const u = session.user;
+        setUser({
+          user: u,
+          session,
+          email: u.email,
+          name:
+            u.user_metadata?.full_name ||
+            u.user_metadata?.name ||
+            u.email,
+        });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Test de Supabase solo en desarrollo
+  useEffect(() => {
+    if (!__DEV__) return;
+
+    const testSupabase = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('countries')
+          .select('*')
+          .limit(3);
+        console.log('Supabase test data:', data);
+        if (error) console.log('Supabase test error:', error);
+      } catch (err) {
+        console.log('Error en prueba de Supabase:', err);
+      }
     };
 
     testSupabase();
@@ -112,6 +181,17 @@ export default function App() {
     []
   );
 
+  const handleLogin = (authPayload) => {
+    // authPayload: { user, session, email, name }
+    setUser(authPayload);
+  };
+
+  const handleLogout = () => {
+    // supabase.auth.signOut se ejecuta en AccountScreen;
+    // aquí solo limpiamos el estado local para volver al stack de auth
+    setUser(null);
+  };
+
   return (
     <NavigationContainer theme={theme}>
       <StatusBar style="light" />
@@ -122,18 +202,16 @@ export default function App() {
         }}
       >
         {user ? (
-          <Stack.Screen
-            name="HermesTravel"
-            component={MainTabs}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="HermesTravel" options={{ headerShown: false }}>
+            {(props) => <MainTabs {...props} onLogout={handleLogout} />}
+          </Stack.Screen>
         ) : (
           <>
             <Stack.Screen name="Login" options={{ headerShown: false }}>
               {(props) => (
                 <LoginScreen
                   {...props}
-                  onLogin={(u) => setUser(u)}
+                  onLogin={handleLogin}
                 />
               )}
             </Stack.Screen>
@@ -141,7 +219,7 @@ export default function App() {
               {(props) => (
                 <RegisterScreen
                   {...props}
-                  onRegister={(u) => setUser(u)}
+                  onRegister={handleLogin}
                 />
               )}
             </Stack.Screen>
