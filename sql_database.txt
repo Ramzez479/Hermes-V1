@@ -1,0 +1,132 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.cities (
+  city_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  country_id bigint NOT NULL,
+  name character varying NOT NULL,
+  region character varying DEFAULT NULL::character varying,
+  latitude numeric DEFAULT NULL::numeric,
+  longitude numeric DEFAULT NULL::numeric,
+  CONSTRAINT cities_pkey PRIMARY KEY (city_id),
+  CONSTRAINT fk_cities_country FOREIGN KEY (country_id) REFERENCES public.countries(country_id)
+);
+CREATE TABLE public.countries (
+  country_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name character varying NOT NULL UNIQUE,
+  iso_code character NOT NULL UNIQUE,
+  CONSTRAINT countries_pkey PRIMARY KEY (country_id)
+);
+CREATE TABLE public.place_categories (
+  place_category_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name character varying NOT NULL UNIQUE,
+  description character varying DEFAULT NULL::character varying,
+  CONSTRAINT place_categories_pkey PRIMARY KEY (place_category_id)
+);
+CREATE TABLE public.place_tags (
+  place_id bigint NOT NULL,
+  tag_id bigint NOT NULL,
+  CONSTRAINT place_tags_pkey PRIMARY KEY (place_id, tag_id),
+  CONSTRAINT fk_place_tags_place FOREIGN KEY (place_id) REFERENCES public.places(place_id),
+  CONSTRAINT fk_place_tags_tag FOREIGN KEY (tag_id) REFERENCES public.tags(tag_id)
+);
+CREATE TABLE public.places (
+  place_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  city_id bigint NOT NULL,
+  place_category_id bigint NOT NULL,
+  name character varying NOT NULL,
+  description text,
+  address character varying DEFAULT NULL::character varying,
+  latitude numeric DEFAULT NULL::numeric,
+  longitude numeric DEFAULT NULL::numeric,
+  average_rating numeric DEFAULT NULL::numeric,
+  price_level smallint,
+  website character varying DEFAULT NULL::character varying,
+  phone character varying DEFAULT NULL::character varying,
+  is_recommended boolean NOT NULL DEFAULT false,
+  CONSTRAINT places_pkey PRIMARY KEY (place_id),
+  CONSTRAINT fk_places_city FOREIGN KEY (city_id) REFERENCES public.cities(city_id),
+  CONSTRAINT fk_places_category FOREIGN KEY (place_category_id) REFERENCES public.place_categories(place_category_id)
+);
+CREATE TABLE public.routes (
+  route_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  origin_city_id bigint NOT NULL,
+  destination_city_id bigint NOT NULL,
+  mode_id bigint NOT NULL,
+  name character varying DEFAULT NULL::character varying,
+  distance_km numeric DEFAULT NULL::numeric,
+  average_duration_min integer,
+  average_price numeric DEFAULT NULL::numeric,
+  CONSTRAINT routes_pkey PRIMARY KEY (route_id),
+  CONSTRAINT fk_routes_origin_city FOREIGN KEY (origin_city_id) REFERENCES public.cities(city_id),
+  CONSTRAINT fk_routes_destination_city FOREIGN KEY (destination_city_id) REFERENCES public.cities(city_id),
+  CONSTRAINT fk_routes_mode FOREIGN KEY (mode_id) REFERENCES public.transport_modes(mode_id)
+);
+CREATE TABLE public.tags (
+  tag_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name character varying NOT NULL UNIQUE,
+  CONSTRAINT tags_pkey PRIMARY KEY (tag_id)
+);
+CREATE TABLE public.transport_modes (
+  mode_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name character varying NOT NULL UNIQUE,
+  CONSTRAINT transport_modes_pkey PRIMARY KEY (mode_id)
+);
+CREATE TABLE public.trip_activities (
+  activity_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  trip_day_id bigint NOT NULL,
+  place_id bigint,
+  route_id bigint,
+  activity_type USER-DEFINED NOT NULL,
+  start_time time without time zone,
+  end_time time without time zone,
+  notes text,
+  estimated_cost numeric DEFAULT NULL::numeric,
+  CONSTRAINT trip_activities_pkey PRIMARY KEY (activity_id),
+  CONSTRAINT fk_trip_activities_trip_day FOREIGN KEY (trip_day_id) REFERENCES public.trip_days(trip_day_id),
+  CONSTRAINT fk_trip_activities_place FOREIGN KEY (place_id) REFERENCES public.places(place_id),
+  CONSTRAINT fk_trip_activities_route FOREIGN KEY (route_id) REFERENCES public.routes(route_id)
+);
+CREATE TABLE public.trip_days (
+  trip_day_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  trip_id bigint NOT NULL,
+  date date NOT NULL,
+  day_index integer NOT NULL,
+  CONSTRAINT trip_days_pkey PRIMARY KEY (trip_day_id),
+  CONSTRAINT fk_trip_days_trip FOREIGN KEY (trip_id) REFERENCES public.trips(trip_id)
+);
+CREATE TABLE public.trips (
+  trip_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  user_id bigint NOT NULL,
+  title character varying NOT NULL,
+  description text,
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  total_budget numeric DEFAULT NULL::numeric,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT trips_pkey PRIMARY KEY (trip_id),
+  CONSTRAINT fk_trips_user FOREIGN KEY (user_id) REFERENCES public.users(user_id)
+);
+CREATE TABLE public.user_preferences (
+  user_id bigint NOT NULL,
+  preferred_language character DEFAULT NULL::bpchar,
+  preferred_currency character DEFAULT NULL::bpchar,
+  budget_level USER-DEFINED,
+  travel_style USER-DEFINED,
+  notifications_enabled boolean NOT NULL DEFAULT true,
+  newsletter_enabled boolean NOT NULL DEFAULT false,
+  CONSTRAINT user_preferences_pkey PRIMARY KEY (user_id),
+  CONSTRAINT fk_user_preferences_user FOREIGN KEY (user_id) REFERENCES public.users(user_id)
+);
+CREATE TABLE public.users (
+  user_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  full_name character varying NOT NULL,
+  email character varying NOT NULL UNIQUE,
+  password_hash character varying,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  is_active boolean NOT NULL DEFAULT true,
+  auth_user_id uuid UNIQUE,
+  CONSTRAINT users_pkey PRIMARY KEY (user_id)
+);

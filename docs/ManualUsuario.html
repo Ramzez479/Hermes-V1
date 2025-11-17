@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manual de Usuario - Hermes</title>
+  <style>
+    :root { --bg:#0b0f14; --fg:#e5e7eb; --muted:#9ca3af; --cyan:#00e5ff; --gray:#1f2937; }
+    body { background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif; margin: 0; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    h1,h2,h3 { color: var(--fg); margin: 16px 0 8px; }
+    p,li { line-height: 1.6; }
+    code { background: var(--gray); padding: 2px 6px; border-radius: 6px; }
+    .section { margin: 20px 0; padding-bottom: 10px; border-bottom: 1px solid #374151; }
+    .img { border: 1px solid #374151; border-radius: 8px; overflow: hidden; margin: 10px 0; }
+    .img img { width: 100%; display: block; }
+    .hint { color: var(--muted); font-size: 0.95rem; }
+    .kbd { background: #111827; color: #f3f4f6; padding: 2px 6px; border-radius: 6px; border: 1px solid #374151; }
+    @media print {
+      body { background: white; color: #111; }
+      .hint { color: #555; }
+      code, .kbd { background: #eee; color: #111; border: 1px solid #ccc; }
+    }
+  </style>
+  </head>
+<body>
+  <div class="wrap">
+    <h1>Manual de Usuario de Hermes</h1>
+    <p>Guía paso a paso para registrarte, iniciar sesión, crear planes de viaje, usar el calendario, gestionar eventos y pedir al agente que agende actividades por ti.</p>
+
+    <div class="section">
+      <h2>Requisitos</h2>
+      <ul>
+        <li>Cuenta activa y conexión a internet.</li>
+        <li>Formato de fecha <code>YYYY-MM-DD</code> y hora <code>HH:MM</code> (24h).</li>
+        <li>Costo solo numérico; admite separador decimal <code>.</code> o <code>,</code>.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Registro</h2>
+      <ol>
+        <li>Abre la app y ve a <strong>Cuenta</strong>.</li>
+        <li>Pulsa <strong>Registrarse</strong> e ingresa tu <strong>email</strong> y <strong>contraseña</strong>.</li>
+        <li>Pulsa <strong>Crear cuenta</strong> y verifica tu correo si es necesario.</li>
+      </ol>
+      <div class="img"><img src="../assets/docs/registro.png" alt="Captura: Pantalla de Registro" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Inicio de Sesión</h2>
+      <ol>
+        <li>Ve a <strong>Cuenta</strong> y pulsa <strong>Iniciar sesión</strong>.</li>
+        <li>Escribe tu <strong>email</strong> y <strong>contraseña</strong> y pulsa <strong>Entrar</strong>.</li>
+        <li>Si olvidaste la contraseña, usa la opción de recuperación.</li>
+      </ol>
+      <div class="img"><img src="../assets/docs/login.png" alt="Captura: Pantalla de Login" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Crear un Plan</h2>
+      <ol>
+        <li>Ve a <strong>Planes</strong> y pulsa <strong>Agregar plan</strong>.</li>
+        <li>Completa <em>Nombre</em>, <em>Fecha de inicio</em>, <em>Fecha de fin</em> y <em>Destino</em> (opcional).</li>
+        <li>Pulsa <strong>Guardar plan</strong>.</li>
+      </ol>
+      <p class="hint">Usa nombres claros (añade destino o año) para que el agente identifique el plan fácilmente.</p>
+      <div class="img"><img src="../assets/docs/crear-plan.png" alt="Captura: Crear Plan" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Detalle del Plan y Calendario</h2>
+      <ul>
+        <li>El calendario cubre todas las semanas del rango de tu plan (mínimo 5 visibles).</li>
+        <li>Los días con eventos aparecen marcados.</li>
+        <li>Toca un día para ver sus eventos.</li>
+      </ul>
+      <div class="img"><img src="../assets/docs/calendario.png" alt="Captura: Calendario del Plan" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Agregar un Evento</h2>
+      <ol>
+        <li>Pulsa <strong>Agregar actividad</strong>.</li>
+        <li>Completa los campos: <strong>Fecha</strong>, <strong>Inicio</strong>, y opcionalmente <strong>Fin</strong>, <strong>Lugar</strong>, <strong>Descripción</strong>, <strong>Costo</strong>.</li>
+        <li>Pulsa <strong>Guardar actividad</strong>.</li>
+      </ol>
+      <p class="hint">La fecha debe estar dentro del rango del plan; el costo acepta solo números y un separador decimal.</p>
+      <div class="img"><img src="../assets/docs/agregar-evento.png" alt="Captura: Formulario Agregar Evento" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Editar un Evento</h2>
+      <ol>
+        <li>En la lista del día, pulsa <strong>Editar</strong> en el evento.</li>
+        <li>Modifica los campos necesarios y pulsa <strong>Guardar cambios</strong>.</li>
+      </ol>
+      <p class="hint">Si cambias la fecha, el evento se mueve al nuevo día y la vista cambia automáticamente.</p>
+      <div class="img"><img src="../assets/docs/editar-evento.png" alt="Captura: Modal Editar Evento" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Eliminar un Evento</h2>
+      <ol>
+        <li>Pulsa <strong>Eliminar</strong> y confirma la acción.</li>
+        <li>La fecha se actualiza y el evento desaparece de la lista.</li>
+      </ol>
+      <div class="img"><img src="../assets/docs/eliminar-evento.png" alt="Captura: Confirmación Eliminar" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Agendar con el Agente (Chat)</h2>
+      <p>Estructura recomendada de pedido:</p>
+      <pre><code>Agenda [actividad] el [YYYY-MM-DD] a las [HH:MM] en [Lugar] para el viaje [Nombre del plan]. [Descripción opcional]. [Fin opcional]. [Costo opcional].</code></pre>
+      <ul>
+        <li>Incluye el <strong>nombre exacto del plan</strong>, <strong>fecha</strong> y <strong>hora de inicio</strong>.</li>
+        <li>Opcional: lugar, descripción, hora de fin, costo (numérico).</li>
+      </ul>
+      <p>Ejemplos correctos:</p>
+      <ul>
+        <li>“Agenda visita al Louvre el 2025-07-14 a las 09:00 en París para el viaje Europa Verano 2025. Durará hasta las 12:00. Costo 20.”</li>
+        <li>“Agenda cena el 2025-07-18 a las 20:30 para el viaje México 2025 en Pujol. Costo 1500.”</li>
+        <li>“Agenda traslado al aeropuerto el 2025-07-14 a las 06:00 para el viaje Europa Verano 2025.”</li>
+      </ul>
+      <div class="img"><img src="../assets/docs/chat-agente.png" alt="Captura: Chat con Agente" /></div>
+    </div>
+
+    <div class="section">
+      <h2>Solución de Problemas</h2>
+      <ul>
+        <li><strong>No se guarda el evento</strong>: verifica fecha, hora de inicio y conexión.</li>
+        <li><strong>Costo inválido</strong>: debe ser numérico; usa separador decimal <code>.</code> o <code>,</code>.</li>
+        <li><strong>No ves el evento</strong>: si cambiaste la fecha al editar, navega al nuevo día.</li>
+        <li><strong>Plan ambiguo en chat</strong>: usa el nombre exacto, añade destino o año.</li>
+      </ul>
+    </div>
+
+    
+  </div>
+</body>
+</html>
